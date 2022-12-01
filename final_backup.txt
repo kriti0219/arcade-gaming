@@ -1,0 +1,1945 @@
+my login form 
+
+<?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    //write query for all pizzas
+    $sql = 'SELECT names, passwords, email FROM pizzas ';
+
+    //make query and get result
+    $result = mysqli_query($conn, $sql);
+
+    //fetch the resulting rows as an array
+    $pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    //free result from memory
+    mysqli_free_result($result);
+
+    //close the connection
+    mysqli_close($conn);
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?> -->
+
+    <form method="post" action="index.php">  
+        User Name:<input type="text" name="username">
+        Pssword:<input type="text" name="password">
+        Email:<input type="text" name="email">
+        <input type="submit" name="submit" value="Submit">  
+    </form>
+    
+    
+    <!-- //home page. -->
+
+    <!-- storing typed data into variable -->
+    <?php if (isset($_POST["submit"])) {  ?>
+   <?php $user_name = $_POST["username"]; ?>
+    <?php $user_password=$_POST["password"]; ?>
+    <?php $user_email=$_POST["email"]; ?>
+   
+   
+   
+   <?php foreach($pizzas as $pizza){ ?>
+    
+    <!-- storing database values  into variables -->
+    <?php $variable = ($pizza['names']); ?>
+    <?php $pass_var = ($pizza['passwords']); ?>
+    <?php $email_var = ($pizza['email']); ?>
+
+    <!-- printing  username as entered -->
+    <?php echo $user_name ; ?> 
+
+    <!-- printing database username -->
+    <?php echo $variable; ?>   
+
+    <!-- printing entered password -->
+    <?php echo $user_password; ?>
+
+    <!-- printing database password -->
+    <?php echo $pass_var; ?>
+
+    <!-- printing entered email -->
+    <?php echo $user_email; ?>
+
+    <!-- printing database email -->
+    <?php echo $email_var;?>
+    
+    
+    <?php if($user_name==$variable && $user_password==$pass_var && $user_email==$email_var){ ?>
+       <?php echo "PASS"; ?>
+    <?php } else { ?>
+        <?php echo "FAIL"; ?>
+    <?php } ?>
+    <?php echo "<br>"; ?>
+
+    
+    
+    
+    <?php } ?>
+    <?php } ?>
+    
+
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+
+--------------------------
+Parthik Login form 
+
+<?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    if($_SERVER['REQUEST_METHOD'] == "POST")
+	{
+      
+        // $user_name=$_POST['username'];
+        $user_pass=$_POST['password'];
+        $user_email=$_POST['email'];
+
+        if(!empty($user_pass) && !empty($user_email)){
+        
+            $sql = "SELECT * FROM pizzas where email= '$user_email' and passwords = '$user_pass'";
+            $result = mysqli_query($conn, $sql);
+                // echo mysqli_num_rows($result);
+                if($result && mysqli_num_rows($result) > 0){
+                    // echo "4";
+                    $user_data=mysqli_fetch_assoc($result);
+                    if($user_data['passwords']==$user_pass){
+                        echo "LOGIN SUCCESSFULL";
+                        $_SESSION['userid']=$user_data['id'];
+                        //print_r($_SESSION);
+                        //header('location: index.php');
+                    }
+                    else{
+                        echo "PASSWORD WRONG";
+                    }
+                }
+
+                else{
+                    echo "WRONG EMAIL OR PASSWORD";
+            
+           
+                //sign up karo be !!
+            }
+        }
+
+    }
+
+
+
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?> -->
+
+    <form method="post" >  
+        <!-- User Name:<input type="text" name="username"> -->
+        Pssword:<input type="text" name="password">
+        Email:<input type="text" name="email">
+        <input type="submit" name="submit" value="Submit">  
+        <a href="add.php">CLICK HERE TO SIGN UP</a>
+    </form>
+    
+    
+    <!-- //home page. -->
+
+    <!-- storing typed data into variable -->
+ 
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+------------------------------------------
+  <!-- printing  username as entered -->
+    <?php echo $user_name ; ?> 
+
+    <!-- printing database username -->
+    <?php echo $variable; ?>   
+
+    <!-- printing entered password -->
+    <?php echo $user_password; ?>
+
+    <!-- printing database password -->
+    <?php echo $pass_var; ?>
+
+    <!-- printing entered email -->
+    <?php echo $user_email; ?>
+
+    <!-- printing database email -->
+    <?php echo $email_var;?>
+    
+
+    ----------------------
+    <?php
+session_start();
+//$conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+
+//check connection
+if(!$conn){
+    echo 'Connection error:' . mysqli_connect_error();
+}
+
+if($_SERVER['REQUEST_METHOD'] == "POST")
+{
+  
+    // $user_name=$_POST['username'];
+    $new_name=$_POST['user_input_name'];
+
+$sql = "UPDATE pizzas SET names='$new_name' where id='$_SESSION[userid]'";
+
+if ($conn->query($sql) === TRUE) {
+  echo "Record updated successfully";
+} else {
+  echo "Error updating record: " . $conn->error;
+}
+}
+$conn->close();
+
+
+ ?>
+
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Document</title>
+ </head>
+ <body>
+     <form action="" method="post">
+         <input type="text" name="user_input_name">
+         <input type="submit" name="submit" value="submit">
+     </form>
+ </body>
+ </html>
+
+
+ -----------------------------
+
+ <?php 
+    session_start();
+   //onnection complete
+   $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+    function score_update(){
+      $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+      $score_count=$_COOKIE["mycookie"];
+      //to update score 
+            $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+            
+            if ($conn->query($sql) === TRUE) {
+                echo "Score updated";
+              }
+              else {
+                  echo "Error";
+              }
+            }
+    
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <!-- <script type="text/javascript" src="jquery-3.6.0.min.js"></script> -->
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <button onclick="reset_board()">RESET</button>
+    
+
+<script>
+
+// 
+var player = "A";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        var count = parseInt(<?php echo $_SESSION['userscore']; ?>);
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+        count = count + 10;
+        console.log(count +"winner");
+        // score_update();
+    // document.write(count);
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    count = count + 0;
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+    count = count +0 ;
+  }
+  
+
+  fcookie='mycookie';
+  document.cookie=fcookie+"=" + count;
+  console.log(count);
+
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+<?php 
+
+
+        $conn->close();
+
+?>
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+      
+    //   // to update score 
+    //   $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+    //   if ($conn->query($sql) === TRUE) {
+    //       echo "Score updated";
+    //     }
+    //     else {
+    //         echo "Error";
+    //     }
+    // }
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+
+
+------------------------------
+
+<?php 
+    session_start();
+    $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+    
+    //check connection
+    if(!$conn){
+        echo 'Connection error:' . mysqli_connect_error();
+    }
+    // connection complete
+    
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <!-- <script type="text/javascript" src="jquery-3.6.0.min.js"></script> -->
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <button onclick="reset_board()">RESET</button>
+    
+
+<script>
+
+var count = parseInt('<?php echo $_SESSION['userscore']; ?>');
+var player = "A";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+        count = count + 10;
+    // document.write(count);
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    count = count + 0;
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+    count = count +0 ;
+  }
+  
+
+  fcookie='mycookie';
+  document.cookie=fcookie+"=" + count;
+  console.log(count);
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+<?php 
+
+$score_count=$_COOKIE["mycookie"];
+//to update score 
+      $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+      if ($conn->query($sql) === TRUE) {
+          echo "Score updated";
+        }
+        else {
+            echo "Error";
+        }
+        
+?>
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+      
+    //   // to update score 
+    //   $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+    //   if ($conn->query($sql) === TRUE) {
+    //       echo "Score updated";
+    //     }
+    //     else {
+    //         echo "Error";
+    //     }
+    // }
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+-----------------------------
+<?php 
+    session_start();
+   //onnection complete
+   $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+    
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <!-- <script type="text/javascript" src="jquery-3.6.0.min.js"></script> -->
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <button onclick="reset_board()">RESET</button>
+    
+
+<script>
+var count = parseInt(<?php echo $_SESSION['userscore']; ?>);
+var player = "A";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+        count = count + 10;
+        console.log(count +"winner");
+        // score_update();
+    // document.write(count);
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    count = count + 0;
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+    count = count +0 ;
+  }
+  
+
+  fcookie='mycookie';
+  document.cookie=fcookie+"=" + count;
+  console.log(count);
+
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+<?php 
+       $score_count=$_COOKIE["mycookie"];
+       //to update score 
+             $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+             
+             if ($conn->query($sql) === TRUE) {
+                 echo "Score updated";
+               }
+               else {
+                   echo "Error";
+               }
+
+        $conn->close();
+
+?>
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+      
+    //   // to update score 
+    //   $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+    //   if ($conn->query($sql) === TRUE) {
+    //       echo "Score updated";
+    //     }
+    //     else {
+    //         echo "Error";
+    //     }
+    // }
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+
+----------------------------------------------------------------------------------------
+(BOHOT HI ZAADA IMPORTANT BHAI !!!!!)
+
+
+<?php 
+    session_start();
+   //onnection complete
+   $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+    $sql="SELECT scores FROM pizzas where id = '$_SESSION[userid]'";
+
+    $result=mysqli_query($conn,$sql);
+    $counter=0;
+    if($result){
+        $counter=mysqli_fetch_assoc($result)['scores'];
+        echo $counter;
+    }
+    function score_update($counter){
+      $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+      $yo = "UPDATE pizzas SET scores='$counter' where id= '$_SESSION[userid]' ";
+      $result=mysqli_query($conn,$yo);
+    }
+    
+    
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <!-- <script type="text/javascript" src="jquery-3.6.0.min.js"></script> -->
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <a href="tiktak.php"> <button>RESET</button></a>
+    
+
+<script>
+
+// document.write(count);
+var player = "A";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+        // count = count + 10;
+        // console.log(count +"winner");
+       <?php $counter=$counter+10; echo score_update($counter);?>
+    // document.write(count);
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    count = count + 0;
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+    count = count +0 ;
+  }
+  
+
+  // fcookie='mycookie';
+  // document.cookie=fcookie+"=" + count;
+  // console.log(count);
+
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+      
+    //   // to update score 
+    //   $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+    //   if ($conn->query($sql) === TRUE) {
+    //       echo "Score updated";
+    //     }
+    //     else {
+    //         echo "Error";
+    //     }
+    // }
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+
+
+--------------------------------------
+
+(THE FINAL TIK TAC)
+
+
+<?php 
+    session_start();
+   
+    //connectin
+   $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+    //fetching data
+    $sql="SELECT scores FROM pizzas where id = '$_SESSION[userid]'";
+
+    $result=mysqli_query($conn,$sql);
+
+    //initializing counter
+    $counter=0;
+    if($result){
+        $counter=mysqli_fetch_assoc($result)['scores'];
+        echo $counter;
+    }
+
+    //function to update score
+    function score_update($counter){
+
+      //connecting again 
+      $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+
+      //actual update
+      $yo = "UPDATE pizzas SET scores='$counter' where id= '$_SESSION[userid]' ";
+      mysqli_query($conn,$yo);
+    }
+    
+    
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <!-- <script type="text/javascript" src="jquery-3.6.0.min.js"></script> -->
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <a href="tiktak.php"> <button>RESET</button></a>
+    
+
+<script>
+
+var player = "O";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+
+        //calling function if the user wins
+       <?php $counter=$counter+10; echo score_update($counter);?>
+    
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    count = count + 0;
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+    count = count +0 ;
+  }
+  
+
+  // fcookie='mycookie';
+  // document.cookie=fcookie+"=" + count;
+  // console.log(count);
+
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+
+
+-----------------------------------------------------
+<?php 
+    session_start();
+    $score_var=0;
+   //onnection complete
+   $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+    $sql="SELECT scores FROM pizzas where id = '$_SESSION[userid]'";
+
+    $result=mysqli_query($conn,$sql);
+    $counter=0;
+    if($result){
+        $counter=mysqli_fetch_assoc($result)['scores'];
+        echo $counter;
+    }
+    if($score_var==1){
+    function score_update($counter){
+      $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+      $yo = "UPDATE pizzas SET scores='$counter' where id= '$_SESSION[userid]' ";
+      $result=mysqli_query($conn,$yo);
+    }
+    
+  }
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <!-- <script type="text/javascript" src="jquery-3.6.0.min.js"></script> -->
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <a href="tiktak.php"> <button>RESET</button></a>
+    
+
+<script>
+
+// document.write(count);
+var player = "A";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+        // count = count + 10;
+        // console.log(count +"winner");
+      <?php  $score_var=1;?>
+    // document.write(count);
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    <?php  $score_var=0;?>
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+    <?php  $score_var=0;?>
+  }
+  
+
+  // fcookie='mycookie';
+  // document.cookie=fcookie+"=" + count;
+  // console.log(count);
+
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+      
+    //   // to update score 
+    //   $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+    //   if ($conn->query($sql) === TRUE) {
+    //       echo "Score updated";
+    //     }
+    //     else {
+    //         echo "Error";
+    //     }
+    // }
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+-------------------------------------------------
+
+(ajax ki maa ka bhosda tohri maiyya)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <script>
+   var myVar = "test";
+
+ $.ajax({
+  url: "/tuts/home/readJson.php",
+  type: "POST",
+  data:{"myData":myVar}
+}).done(function(data) {
+     console.log(data);
+});
+  </script>
+</body>
+</html>
+
+
+--------------------------------------------------
+
+<?php 
+    session_start();
+   
+   //onnection complete
+   $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+   //check connection
+   if(!$conn){
+     echo 'Connection error:' . mysqli_connect_error();
+    }
+    
+    $sql="SELECT scores FROM pizzas where id = '$_SESSION[userid]'";
+
+    $result=mysqli_query($conn,$sql);
+    $counter=0;
+    if($result){
+        $counter=mysqli_fetch_assoc($result)['scores'];
+        echo $counter;
+    }
+   
+  //   function score_update($counter){
+  //     $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+   
+  //  //check connection
+  //  if(!$conn){
+  //    echo 'Connection error:' . mysqli_connect_error();
+  //   }
+  //     $yo = "UPDATE pizzas SET scores='$counter' where id= '$_SESSION[userid]' ";
+  //     $result=mysqli_query($conn,$yo);
+  //   }
+    
+  // }
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tick-Tac-Toe</title>
+    <link rel="stylesheet" href="tiktak.css" />
+    <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="play-area">
+
+        </div>
+        <h2 id="winner"></h2>
+        <a href="tiktak.php"> <button>RESET</button></a>
+    
+
+<script>
+
+let count = parseInt(<?php echo $counter; ?>);
+// document.write(count);
+var player = "A";
+const computer = "X";
+var name = player;
+
+let board_full = false;
+let play_board = ["", "", "", "", "", "", "", "", ""];
+
+const board_container = document.querySelector(".play-area");
+
+const winner_statement = document.getElementById("winner");
+
+check_board_complete = () => {
+  let flag = true;
+  play_board.forEach(element => {
+    if (element != player && element != computer) {
+      flag = false;
+    }
+  });
+  board_full = flag;
+};
+
+
+const check_line = (a, b, c) => {
+  return (
+    play_board[a] == play_board[b] &&
+    play_board[b] == play_board[c] &&
+    (play_board[a] == player || play_board[a] == computer)
+  );
+};
+
+const check_match = () => {
+  for (i = 0; i < 9; i += 3) {
+    if (check_line(i, i + 1, i + 2)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 1}`).classList.add("win");
+      document.querySelector(`#block_${i + 2}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  for (i = 0; i < 3; i++) {
+    if (check_line(i, i + 3, i + 6)) {
+      document.querySelector(`#block_${i}`).classList.add("win");
+      document.querySelector(`#block_${i + 3}`).classList.add("win");
+      document.querySelector(`#block_${i + 6}`).classList.add("win");
+      return play_board[i];
+    }
+  }
+  if (check_line(0, 4, 8)) {
+    document.querySelector("#block_0").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_8").classList.add("win");
+    return play_board[0];
+  }
+  if (check_line(2, 4, 6)) {
+    document.querySelector("#block_2").classList.add("win");
+    document.querySelector("#block_4").classList.add("win");
+    document.querySelector("#block_6").classList.add("win");
+    return play_board[2];
+}
+return "";
+};
+
+const check_for_winner = () => {
+    let res = check_match()
+    if (res == player) {
+        
+        winner.innerText = "Winner is " + "<?php echo $_SESSION['username'];?>";
+        count = count + 10;
+        // console.log(count +"winner");
+        $.ajax({
+  url: "/tuts/home/readJson.php",
+  type: "POST",
+  data:{"myData":count}
+}).done(function(data) {
+    //  console.log(data);
+    <?php  ?>
+});
+    // document.write(count);
+    winner.classList.add("playerWin");
+    board_full = true
+  } else if (res == computer) {
+    winner.innerText = "Winner is computer";
+    winner.classList.add("computerWin");
+    
+    board_full = true
+  } else if (board_full) {
+    winner.innerText = "Draw!";
+    winner.classList.add("draw");
+  
+  }
+  
+
+  // fcookie='mycookie';
+  // document.cookie=fcookie+"=" + count;
+  // console.log(count);
+
+};
+
+
+
+const render_board = () => {
+  board_container.innerHTML = ""
+  play_board.forEach((e, i) => {
+    board_container.innerHTML += `<div id="block_${i}" class="block" onclick="addPlayerMove(${i})">${play_board[i]}</div>`
+    if (e == player || e == computer) {
+      document.querySelector(`#block_${i}`).classList.add("occupied");
+    }
+  });
+};
+
+const game_loop = () => {
+  render_board();
+  check_board_complete();
+  check_for_winner();
+}
+
+const addPlayerMove = e => {
+  if (!board_full && play_board[e] == "") {
+    play_board[e] = player;
+    game_loop();
+    addComputerMove();
+  }
+};
+
+const addComputerMove = () => {
+  if (!board_full) {
+    do {
+      selected = Math.floor(Math.random() * 9);
+    } while (play_board[selected] != "");
+    play_board[selected] = computer;
+    game_loop();
+  }
+};
+
+const reset_board = () => {
+  play_board = ["", "", "", "", "", "", "", "", ""];
+  board_full = false;
+  winner.classList.remove("playerWin");
+  winner.classList.remove("computerWin");
+  winner.classList.remove("draw");
+  winner.innerText = "";
+  render_board();
+};
+
+//initial render
+render_board();
+
+</script>
+
+
+    <!-- // if (isset($_COOKIE["mycookie"])){
+    //   echo $_COOKIE["mycookie"];
+    // }
+    //   $score_count=$_COOKIE["mycookie"];
+      
+    //   // to update score 
+    //   $sql = "UPDATE pizzas SET scores='$score_count' where id= '$_SESSION[userid]' ";
+      
+    //   if ($conn->query($sql) === TRUE) {
+    //       echo "Score updated";
+    //     }
+    //     else {
+    //         echo "Error";
+    //     }
+    // }
+    //     else
+    //        echo "Cookie Not Set";
+
+    //        $conn->close(); -->
+        
+</div>
+</body>
+
+</html>
+-----------------------------------------------------
+
+(haan bhai aur tiktak nahi yeh final hain pakka promise)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+ 
+</head>
+<body>
+  <input type="text" id="name">
+  <button class="submit">submit</button>
+  <div id="hello"></div>
+  <script src="jquery-3.6.0.min.js"></script>
+    <script>
+    $(".submit").click(function(){
+      var name = $("#name").val();
+      $.post(
+        "readJson.php",
+        { name: name},
+        function(response){
+          $('#hello').html(response);
+          console.log(response);
+        }
+      );
+    });
+  </script>
+</body>
+</html>
+
+---------------------------------------------------------------------------
+(for email confirmation)
+<?php 
+session_start();
+include('config/db_connect.php');
+$confirm_email=$_SESSION['useremail'];
+$confirm_name=$_SESSION['username'];
+$confirm_password=$_SESSION['userpassword'];
+$sql = "INSERT INTO pizzas(names,passwords,email,scores) VALUES('$confirm_name','$confirm_password','$confirm_email',0)";
+mysqli_query($conn,$sql);
+echo $confirm_email;
+echo "Email confirmed";
+?>
+-----------------------------------------------------------------------------------------
+
+<?php 
+session_start();
+include('config/db_connect.php');
+$confirm_email=$_SESSION['useremail'];
+$confirm_name=$_SESSION['username'];
+$confirm_password=$_SESSION['userpassword'];
+$sql = "INSERT INTO pizzas(names,passwords,email,scores) VALUES('$confirm_name','$confirm_password','$confirm_email',0)";
+mysqli_query($conn,$sql);
+echo $confirm_email;
+echo "Email confirmed";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="emailconfirmstyle.css">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+    <h1 class="neonText">
+          Email has been confirmed!<br><br>Please login again
+    </h1>
+    <a href="login.php" class="login"><h2><br>Click here to login </h2></a>
+
+ </div>
+</body>
+</html>
+

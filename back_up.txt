@@ -1,0 +1,604 @@
+//index.php
+
+<?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    //write query for all pizzas
+    $sql = 'SELECT names, passwords, email, id FROM pizzas ORDER BY created_at';
+
+    //make query and get result
+    $result = mysqli_query($conn, $sql);
+
+    //fetch the resulting rows as an array
+    $pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    //free result from memory
+    mysqli_free_result($result);
+
+    //close the connection
+    mysqli_close($conn);
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <?php include('<header.php'); ?>
+<!-- //home page. -->
+
+    
+
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+
+//add.php
+<?php
+
+include('config/db_connect.php');
+
+---------------------------------------------------------------------------------
+
+$names = $email = $passwords = '';
+$error = array('email'=>'','names'=>'', 'passwords'=>'');
+
+if(isset($_POST['submit'])){
+    // echo htmlspecialchars($_POST['email']);
+    // echo htmlspecialchars($_POST['names']);
+    // echo htmlspecialchars($_POST['passwords']);
+
+    //check email
+    if(empty($_POST['email'])){
+        $error['email']= 'An email is required <br />';
+    } 
+    else{
+        $email = $_POST['email'];
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            $error['email']= 'Email must be a valid email address';
+        }
+    }
+
+     //check names
+     if(empty($_POST['names'])){
+        $error['names']=  'A user name is required <br />';
+    } 
+    else{
+        $names = $_POST['names'];
+        if(!preg_match('/^[a-zA-Z\s]+$/', $names)){
+            $error['names']= 'names must be letters and spaces only';
+        }
+    }
+
+     //check passwords
+     if(empty($_POST['passwords'])){
+        $error['passwords']='A password is required <br />';
+    } 
+    else{
+        $passwords=$_POST['passwords'];
+        if(!preg_match('/^[a-zA-Z]+$/', $passwords)){
+            $error['passwords']="there can't be spaces or special characters like numbers in between";
+        }
+
+        //checking if any error while submitting 
+        if(array_filter($error)){
+           // echo 'errors in the form';
+        }
+        else {
+            
+            // "mysqli_real_escape_string" this helps unwanted or harmful data to get into our database
+            $email = mysqli_real_escape_string($conn, $_POST['email']); 
+            $names = mysqli_real_escape_string($conn, $_POST['names']);
+            $passwords = mysqli_real_escape_string($conn, $_POST['passwords']);
+
+            //create sql
+            $sql = "INSERT INTO pizzas(names,email,passwords) VALUES(' $names', '$email','$passwords')";
+
+            //save to db and check
+            if(mysqli_query($conn, $sql)){
+                //success
+                header('Location: index.php');
+            }
+            else{
+                //error
+                echo 'query error' . mysqli_error($conn);
+            }
+
+            //echo 'form is valid';
+           
+        }
+    }
+} // end of POST check
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?>  -->
+
+    <div class="container">
+        <div class="box">
+        <h4 class="Login">Sign-up</h4>
+        <form action="add.php" class="form" method="POST">
+            <label for="Email">Email:</label>
+            <input type="text" name="email" value="<?php echo htmlspecialchars($email) ?>">
+            <div class="red-text"><?php echo $error['email']; ?></div>
+            <label for="names">name:</label>
+            <input type="text" name="names" value="<?php echo htmlspecialchars($names) ?>">
+            <div class="red-text"><?php echo $error['names']; ?></div>
+            <label>Password:</label>
+        <input type="text" name="passwords" value="<?php echo htmlspecialchars($passwords) ?>">
+        <div class="red-text"><?php echo $error['passwords']; ?></div>
+        <div class="button">
+            <input type="submit" name="submit" value="submit">
+        </div>
+        </form>
+        </div>
+    </div>
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+//db_connect.php
+<?php
+//connect to database
+    $conn = mysqli_connect('localhost', 'adarsh', 'test1234', 'ninja_pizza');
+
+    //check connection
+    if(!$conn){
+        echo 'Connection error:' . mysqli_connect_error();
+    }
+
+    ?>
+
+
+    ----------------------------------
+
+    <?php
+$var=0;
+if (isset($_POST["submit"])) {
+  $email = $_POST["username"];
+  echo $email;
+  foreach($pizzas as $pizza){
+
+    if($pizza['names']==$email){
+        $var++;
+    }
+}
+if($var!=0){
+    echo "YES";
+}
+else{
+    echo "NO";
+}
+}
+
+?>
+<form method="post" action="index.php">  
+    User Name:<input type="text" name="username">
+   <input type="submit" name="submit" value="Submit">  
+</form>
+
+-------------------------------
+login IMPORTANTTTTTTTTTT 
+
+<?php
+global $conn;
+$conn=mysqli_connect('localhost','adarsh','test1234','ninja_pizza') or die ("Connection Failed");
+if(!empty($_POST['save'])){
+    $names=$_POST['user_name'];
+    $passwords=$_POST['user_passwords'];
+    $query="SELECT * FROM pizzas ";
+    $result=mysqli_query($conn,$query);
+    // print_r($result);
+    $count=mysqli_num_rows($result);
+    //echo $count;
+    if($count>0){
+        echo 'Login Unsuccessful';
+    }
+    else{
+        'login successfull';
+    }
+}
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+</head>
+<body>
+    <form method="post">
+        <label for="user_name">
+            <input type="text" name ="user_name"/>
+        </label>
+        <label for="user_passwords">
+        <input type="text" name="user_passwords"/>
+        </label>
+        <input type="submit" name="save" value="Login"/>
+    </form>
+</body>
+</html>
+
+
+---------
+
+<!-- <div class="col s6 md3">
+                    <div class="card z-depth-0">
+                        <div class="card-content center">
+                            <h6><?php $variable = ($pizza['names']); ?></h6> -->
+
+
+  ----------------------------------------
+
+  <?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    //write query for all pizzas
+    $sql = 'SELECT names, passwords, email, id FROM pizzas ORDER BY created_at';
+
+    //make query and get result
+    $result = mysqli_query($conn, $sql);
+
+    //fetch the resulting rows as an array
+    $pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    //free result from memory
+    mysqli_free_result($result);
+
+    //close the connection
+    mysqli_close($conn);
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?> -->
+
+    <form method="post" action="index.php">  
+        User Name:<input type="text" name="username">
+        <input type="submit" name="submit" value="Submit">  
+    </form>
+    
+    
+    <!-- //home page. -->
+    <?php if (isset($_POST["submit"])) {  ?>
+   <?php $email = $_POST["username"]; ?>
+   
+   
+   
+   <?php foreach($pizzas as $pizza){ ?>
+    
+    <?php echo $email ; ?>
+    
+    <?php $variable = ($pizza['names']); ?>
+    <?php echo $variable; ?>   
+    <?php //echo $email; ?> 
+    <!-- <div> echo htmlspecialchars($pizza['passwords']);</div>  -->
+    
+    
+    
+    <?php } ?>
+    <?php } ?>
+    
+
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+
+
+----------------------------------
+
+<?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    //write query for all pizzas
+    $sql = 'SELECT names, passwords, email, id FROM pizzas ORDER BY created_at';
+
+    //make query and get result
+    $result = mysqli_query($conn, $sql);
+
+    //fetch the resulting rows as an array
+    $pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    //free result from memory
+    mysqli_free_result($result);
+
+    //close the connection
+    mysqli_close($conn);
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?> -->
+
+    <form method="post" action="index.php">  
+        User Name:<input type="text" name="username">
+        <input type="submit" name="submit" value="Submit">  
+    </form>
+    
+    
+    <!-- //home page. -->
+    <?php if (isset($_POST["submit"])) {  ?>
+   <?php $email = $_POST["username"]; ?>
+   
+   
+   
+   <?php foreach($pizzas as $pizza){ ?>
+
+    <!-- <?php echo $email ; ?>  -->
+    
+    <?php $variable = ($pizza['names']); ?>
+    <!-- <?php echo $variable; ?>    -->
+    
+    <?php if($email==$variable){ ?>
+       <?php echo "successful"; ?>
+    <?php } ?>
+
+    <!-- <div> echo htmlspecialchars($pizza['passwords']);</div>  -->
+    
+    
+    
+    <?php } ?>
+    <?php } ?>
+    
+
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+
+------------------------------------------
+BOHOT ZAROOOOORIIIIIIIIIIIIIII (INDEX.PHP)
+
+
+<?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    //write query for all pizzas
+    $sql = 'SELECT names, passwords, email FROM pizzas ';
+
+    //make query and get result
+    $result = mysqli_query($conn, $sql);
+
+    //fetch the resulting rows as an array
+    $pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    //free result from memory
+    mysqli_free_result($result);
+
+    //close the connection
+    mysqli_close($conn);
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?> -->
+
+    <form method="post" action="index.php">  
+        User Name:<input type="text" name="username">
+        Pssword:<input type="text" name="password">
+        Email:<input type="text" name="email">
+        <input type="submit" name="submit" value="Submit">  
+    </form>
+    
+    
+    <!-- //home page. -->
+
+    <!-- storing typed data into variable -->
+    <?php if (isset($_POST["submit"])) {  ?>
+   <?php $user_name = $_POST["username"]; ?>
+    <?php $user_password=$_POST["password"]; ?>
+    <?php $user_email=$_POST["email"]; ?>
+   
+   
+   
+   <?php foreach($pizzas as $pizza){ ?>
+    
+    <!-- storing database values  into variables -->
+    <?php $variable = ($pizza['names']); ?>
+    <?php $pass_var = ($pizza['passwords']); ?>
+    <?php $email_var = ($pizza['email']); ?>
+
+    <!-- printing  username as entered -->
+    <?php echo $user_name ; ?> 
+
+    <!-- printing database username -->
+    <?php echo $variable; ?>   
+
+    <!-- printing entered password -->
+    <?php echo $user_password; ?>
+
+    <!-- printing database password -->
+    <?php echo $pass_var; ?>
+
+    <!-- printing entered email -->
+    <?php echo $user_email; ?>
+
+    <!-- printing database email -->
+    <?php echo $email_var;?>
+    
+    
+    <?php if($user_name==$variable && $user_password==$pass_var && $user_email==$email_var){ ?>
+       <?php echo "PASS"; ?>
+    <?php } else { ?>
+        <?php echo "FAIL"; ?>
+    <?php } ?>
+    <?php echo "<br>"; ?>
+
+    
+    
+    
+    <?php } ?>
+    <?php } ?>
+    
+
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
+
+------------------------------
+
+   <?php if (isset($_POST["submit"])) {  ?>
+   <?php $user_name = $_POST["username"]; ?>
+    <?php $user_password=$_POST["password"]; ?>
+    <?php $user_email=$_POST["email"]; ?>
+   
+   
+   
+   <?php foreach($pizzas as $pizza){ ?>
+    
+    <!-- storing database values  into variables -->
+    <?php $variable = ($pizza['names']); ?>
+    <?php $pass_var = ($pizza['passwords']); ?>
+    <?php $email_var = ($pizza['email']); ?>
+
+    <!-- printing  username as entered -->
+     <?php echo $user_name ; ?> 
+
+    <!-- printing database username -->
+    <?php echo $variable; ?>   
+
+    <!-- printing entered password -->
+    <?php echo $user_password; ?>
+
+    <!-- printing database password -->
+    <?php echo $pass_var; ?>  
+
+    <!-- printing entered email -->
+    <?php echo $user_email; ?>
+
+    <!-- printing database email -->
+    <?php echo $email_var;?>
+    
+    
+    <?php if($user_name==$variable && $user_password==$pass_var && $user_email==$email_var){ ?>
+       <?php echo "PASS"; ?>
+    <?php } else { ?>
+        <?php echo "FAIL"; ?>
+    <?php } ?>
+    <?php echo "<br>"; ?>
+
+    
+    
+    
+    <?php } ?>
+    <?php } ?>
+    
+-----------------------------------------------------------------
+backup of login page by dada
+
+<?php
+
+   include('config/db_connect.php'); //this makes a connection
+
+    // //write query for all pizzas
+    // $sql = 'SELECT names, passwords, email FROM pizzas ';
+
+    // //make query and get result
+    // $result = mysqli_query($conn, $sql);
+
+    // //fetch the resulting rows as an array
+    // $pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    // //free result from memory
+    // mysqli_free_result($result);
+
+    // //close the connection
+    // mysqli_close($conn);
+
+    if($_SERVER['REQUEST_METHOD'] == "POST")
+	{
+      
+        // $user_name=$_POST['username'];
+        $user_pass=$_POST['password'];
+        $user_email=$_POST['email'];
+
+        if(!empty($user_pass) && !empty($user_email)){
+        
+            $sql = "SELECT * FROM pizzas where email= '$user_email'";
+            $result = mysqli_query($conn, $sql);
+                // echo mysqli_num_rows($result);
+                if($result && mysqli_num_rows($result) > 0){
+                    // echo "4";
+                    $user_data=mysqli_fetch_assoc($result);
+                    if($user_data['passwords']==$user_pass){
+                        echo "LOGIN SUCCESSFULL";
+                    }
+                    else{
+                        echo "PASSWORD WRONG";
+                    }
+                }
+
+                else{
+                    echo "WRONG USERNAME OR PASSWORD";
+            
+           
+                //sign up karo be !!
+            }
+        }
+
+    }
+
+
+
+
+   
+
+?>
+
+<!DOCTYPE html>
+<html>
+    <!-- <?php include('<header.php'); ?> -->
+
+    <form method="post" >  
+        <!-- User Name:<input type="text" name="username"> -->
+        Pssword:<input type="text" name="password">
+        Email:<input type="text" name="email">
+        <input type="submit" name="submit" value="Submit">  
+        <a href="add.php">CLICK HERE TO SIGN UP</a>
+    </form>
+    
+    
+    <!-- //home page. -->
+
+    <!-- storing typed data into variable -->
+ 
+   <!-- //incase koi error hui toh waapas idhar paste kardena -->
+
+    <?php include('footer.php'); ?>
+
+</body>
+</html>
+
